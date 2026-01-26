@@ -54,7 +54,7 @@ class PDFToVideoConverter:
                 
                 page = data["page"]
                 text = data["text"]
-                print(f"Page {page}: {text}")
+                # print(f"Page {page}: {text}")
 
                 texts.append(text)
         return texts
@@ -79,12 +79,21 @@ class PDFToVideoConverter:
 
         return image_paths
     
-    def generate_audio_edge_tts(self, text: str, output_path: Path, voice: str = 'th-TH-PremwadeeNeural'):
-        """Generate audio using Edge TTS (Microsoft's high-quality TTS)
+    def generate_audio_edge_tts(self, text: str, output_path: Path, 
+                                voice: str = 'th-TH-PremwadeeNeural',
+                                rate: str = "+0%",
+                                pitch: str = "+0Hz",
+                                volume: str = "+0%") -> float:
+        """
+        Generate audio using Edge TTS with advanced customization
         
-        Popular Thai voices:
-        - th-TH-PremwadeeNeural (Female)
-        - th-TH-NiwatNeural (Male)
+        Args:
+            text: Text to convert
+            output_path: Output file path
+            voice: Voice name
+            rate: Speaking rate (-100% to +100%, e.g., '+20%', '-50%')
+            pitch: Pitch adjustment (-100Hz to +100Hz, e.g., '+10Hz', '-20Hz')
+            volume: Volume adjustment (-100% to +100%, e.g., '+50%', '-25%')
         """
 
         try:
@@ -102,7 +111,7 @@ class PDFToVideoConverter:
         
         # Generate speech using edge-tts
         async def generate():
-            communicate = edge_tts.Communicate(text, voice)
+            communicate = edge_tts.Communicate(text, voice, rate=rate, pitch=pitch, volume=volume)
             await communicate.save(str(output_path))
 
         # Run async function
@@ -112,12 +121,34 @@ class PDFToVideoConverter:
 
         return duration
     
-    def generate_audio_gtts(self, text: str, output_path: Path):
-        pass
+    def generate_audio_gtts(self, text: str, output_path: Path,
+                            lang: str = 'th',
+                            slow: bool = False) -> float:
+        """Generate audio using Google Text-to-Speech"""
+
+        try:
+            from gtts import gTTS
+        except ImportError:
+            print("Installing gTTS...")
+            os.system("uv add gTTS")
+            from gtts import gTTS
+        
+        tts = gTTS(text, lang=lang, slow=slow)
+        tts.save(str(output_path))
+
+        duration = self._get_audio_duration(output_path)
+
+        return duration
 
     def create_page_videos(self, image_paths: List[Path], texts: List[str],
-                        tts_engine: str = 'edge_tts', lang: str = 'th',
-                        voice: str = 'th-TH-PremwadeeNeural') -> List[Path]:
+                        tts_engine: str = 'edge_tts',
+                        lang: str = 'th',
+                        # Edge TTS parameters
+                        voice: str = 'th-TH-PremwadeeNeural',
+                        edge_rate: str = '+0%',
+                        edge_pitch: str = '+0Hz',
+                        edge_volume: str = '+0%') -> List[Path]:
+        
         """Create individual video clips for each page with audio"""
         
         print(f"\nGenerating audio and videos using {tts_engine}...")
@@ -135,9 +166,9 @@ class PDFToVideoConverter:
             print("     Generating audio...")
 
             if tts_engine == 'edge_tts':
-                duration = self.generate_audio_edge_tts(text, audio_path, voice)
+                duration = self.generate_audio_edge_tts(text, audio_path, voice, edge_rate, edge_pitch, edge_volume)
             else:
-                pass
+                duration = self.generate_audio_gtts(text, audio_path, lang)
 
             print(f"    Audio duration: {duration: .2f}s")
 
@@ -199,18 +230,15 @@ class PDFToVideoConverter:
     
     def convert(self, dpi: int = 300, tts_engine: str = 'edge_tts',
                 lang: str = 'th', voice: str = 'th-TH-PremwadeeNeural',
-                output_name: str = 'final_video.mp4'):
+                output_name: str = 'final_video.mp4', **tts_params):
         """Full conversion pipeline"""
+        print()
         print(f"=" * 60)
         print(f"PDF to Video Converter")
         print(f"=" * 60)
         print(f"Input: {self.pdf_path}")
         print(f"Output: {self.output_dir}")
         print(f"TTS Engine: {tts_engine}")
-        if tts_engine == 'edge_tts':
-            print(f"Voice: {voice}")
-        else:
-            print(f"Language: {lang}")
         print(f"=" * 60)
 
         # Step 1: Extract pages as images
@@ -220,7 +248,7 @@ class PDFToVideoConverter:
         texts = self.extract_text_from_jsonl()
 
         # Step 3: Create videos with audio
-        video_paths = self.create_page_videos(image_paths, texts, tts_engine, lang, voice)
+        video_paths = self.create_page_videos(image_paths, texts, tts_engine, **tts_params)
 
         # Step 4: Merge all videos
         final_video = self.merge_video(video_paths, output_name)
