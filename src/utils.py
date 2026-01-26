@@ -17,7 +17,7 @@ except ImportError:
 class PDFToVideoConverter:
     """Convert PDF pages to video with audio narration"""
 
-    def __init__(self, pdf_path: str, script_path: str , output_dir: str = "../outputs"):
+    def __init__(self, pdf_path: str, script_path: str , output_dir: str = "./outputs"):
         self.pdf_path = Path(pdf_path)
         self.script_path = Path(script_path)
         self.output_dir = Path(output_dir)
@@ -25,8 +25,10 @@ class PDFToVideoConverter:
 
         self.images_dir = self.output_dir / "images"
         self.audio_dir = self.output_dir / "audio"
+        self.video_dir = self.output_dir / "videos"
         self.images_dir.mkdir(exist_ok=True)
         self.audio_dir.mkdir(exist_ok=True)
+        self.video_dir.mkdir(exist_ok=True)
 
         self.page_data = []
 
@@ -126,7 +128,7 @@ class PDFToVideoConverter:
 
         for i, (img_path, text) in enumerate(zip(image_paths, texts), 1):
             audio_path = self.audio_dir / f"page_{i:03d}.mp3"
-            video_path = self.output_dir / f"page_{i:03d}_video.mp4"
+            video_path = self.video_dir / f"page_{i:03d}_video.mp4"
 
             # Generate audio
             print(f"\n  Page {i}/{len(image_paths)}:")
