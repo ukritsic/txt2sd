@@ -20,9 +20,11 @@ A Python tool for converting PDF presentations into narrated video files using T
 # Install uv if you haven't already
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Clone and setup
-git clone <repository-url>
+# Extract the project
+unzip txt2sd.zip
 cd txt2sd
+
+# Install dependencies
 uv sync
 
 # Run conversion
@@ -239,9 +241,15 @@ pdftoppm -v  # Linux/Mac
 
 This project is available for use under standard software licensing terms.
 
-## Contributing
+## Sharing
 
-Contributions are welcome! Please feel free to submit issues or pull requests.
+This project is distributed as a zip file. To share with others:
+
+1. Ensure all your changes are saved
+2. Zip the entire project directory
+3. Share the zip file
+
+Recipients should follow the Quick Start guide above to set up the project.
 
 ## Dependencies
 
