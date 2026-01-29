@@ -14,6 +14,21 @@ A Python tool for converting PDF presentations into narrated video files using T
 - **Automatic Merging**: Combines all pages into a single video file
 - **Metadata Generation**: Saves detailed metadata about the conversion process
 
+## Quick Start
+
+```bash
+# Install uv if you haven't already
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Clone and setup
+git clone <repository-url>
+cd txt2sd
+uv sync
+
+# Run conversion
+uv run src/main.py -p your-presentation.pdf -s your-script.jsonl
+```
+
 ## Requirements
 
 - Python >= 3.11
@@ -22,7 +37,21 @@ A Python tool for converting PDF presentations into narrated video files using T
 
 ## Installation
 
-### 1. Install System Dependencies
+### 1. Install uv
+
+If you don't have uv installed:
+
+```bash
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Windows
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Or visit https://docs.astral.sh/uv/getting-started/installation/
+
+### 2. Install System Dependencies
 
 **Ubuntu/Debian:**
 ```bash
@@ -39,16 +68,14 @@ brew install ffmpeg poppler
 - Download FFmpeg from https://ffmpeg.org/download.html
 - Download Poppler from https://github.com/oschwartz10612/poppler-windows/releases
 
-### 2. Install Python Package
+### 3. Install Project Dependencies
 
-Using uv (recommended):
 ```bash
+# Sync all dependencies from uv.lock
+uv sync
+
+# Or install in development mode
 uv pip install -e .
-```
-
-Or using pip:
-```bash
-pip install -e .
 ```
 
 ## Usage
@@ -56,13 +83,13 @@ pip install -e .
 ### Basic Usage
 
 ```bash
-python src/main.py -p path/to/presentation.pdf -s path/to/script.jsonl
+uv run src/main.py -p path/to/presentation.pdf -s path/to/script.jsonl
 ```
 
 ### Advanced Usage with Edge TTS Customization
 
 ```bash
-python src/main.py \
+uv run src/main.py \
   -p presentation.pdf \
   -s script.jsonl \
   -o ./output \
@@ -125,7 +152,7 @@ outputs/
 
 ```bash
 # Convert a PDF with Thai narration using Edge TTS
-python src/main.py \
+uv run src/main.py \
   -p ./inputs/presentation.pdf \
   -s ./inputs/script.jsonl \
   -o ./outputs \
@@ -152,7 +179,27 @@ python src/main.py \
 ### Running Tests
 
 ```bash
-pytest
+uv run pytest
+```
+
+### Adding Dependencies
+
+```bash
+# Add a runtime dependency
+uv add package-name
+
+# Add a development dependency
+uv add --dev package-name
+```
+
+### Updating Dependencies
+
+```bash
+# Update all dependencies
+uv lock --upgrade
+
+# Sync dependencies after updating
+uv sync
 ```
 
 ### Project Structure
