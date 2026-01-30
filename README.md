@@ -237,20 +237,6 @@ pdftoppm -v  # Linux/Mac
 - **Edge TTS**: Check internet connection
 - **gTTS**: Verify language code is correct (`th` for Thai)
 
-## License
-
-This project is available for use under standard software licensing terms.
-
-## Sharing
-
-This project is distributed as a zip file. To share with others:
-
-1. Ensure all your changes are saved
-2. Zip the entire project directory
-3. Share the zip file
-
-Recipients should follow the Quick Start guide above to set up the project.
-
 ## Dependencies
 
 Main dependencies:
